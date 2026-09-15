@@ -1,6 +1,6 @@
 ---
 name: debugging-loop
-description: Diagnose and fix implementation failures systematically without unnecessary changes or architecture drift. Use whenever a build step, test, tool call, or end-to-end run fails, typically during Stage 5 (Build) of the agentic SDLC.
+description: Diagnose and fix implementation failures systematically without unnecessary changes or architecture drift. Use whenever a build step, test, tool call, or end-to-end run fails, typically during Stage 4 (Build) of the agentic SDLC.
 ---
 
 # Debugging Loop

@@ -1,0 +1,6 @@
+{
+  "name": "agentic-sdlc",
+  "description": "A stage-gated SDLC for designing and building agentic systems under a clock: understand, design, plan, build, verify.",
+  "version": "0.2.0",
+  "author": { "name": "tsaxena" }
+}

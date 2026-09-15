@@ -1,159 +1,72 @@
 ---
 name: implementation-planning
-description: Turn an approved DESIGN.md into a small, ordered IMPLEMENTATION_PLAN.md that delivers a working end-to-end vertical slice, split into P0 / P1 / out of scope. Use in Stage 4 (Plan) of the agentic SDLC.
+description: Turn an approved DESIGN.md into a small, ordered IMPLEMENTATION_PLAN.md that delivers a working end-to-end vertical slice, split into P0 / P1 / out of scope, and self-check it before presenting. Use in Stage 3 (Plan) of the agentic SDLC.
 ---
 
 # Implementation Planning
 
-## Purpose
-
-Turn an approved `DESIGN.md` into a small, ordered implementation plan that delivers a working end-to-end vertical slice quickly.
-
-The plan should specify what to build and in what order without changing the approved design.
+Turn an approved `DESIGN.md` into the smallest ordered plan that reaches a working end-to-end system.
 
 ## Input
 
-* `DESIGN.md`
-
-Treat the design, interfaces, invariants, and vertical slice as authoritative.
+`DESIGN.md`. Its design, interfaces, invariants, and vertical slice are authoritative.
 
 ## Method
 
-### 1. Identify the End-to-End Path
+### 1. Find the end-to-end path
 
-Identify the minimum path from real input to real output that proves the design works.
+The minimum path from real input to real output that proves the design works. Include only the components on it.
 
-Include only the components required for that path.
+### 2. Set priorities
 
----
+* **P0** - everything necessary for a working end-to-end system.
+* **P1** - useful, but not needed to prove the architecture.
+* **Out of scope** - explicitly deferred.
 
-### 2. Define Priorities
+Size P0 against the build budget, not against completeness. When in doubt, move it to P1.
 
-Split work into:
+### 3. Break P0 into ordered steps
 
-#### P0 — Required
+Per step: objective, files or modules affected, key interface, expected behavior afterward, and how to verify it. Prefer steps that leave the repository runnable.
 
-Everything necessary for a working end-to-end system.
+### 4. Order for early feedback
 
-#### P1 — If Time Allows
+Respect dependencies, but favor an order that reaches end-to-end execution soonest and exposes the riskiest unknown first. The step most likely to fail should not be the last one.
 
-Useful improvements that are not necessary to prove the architecture.
+### 5. Plan incremental verification
 
-#### Out of Scope
+Every meaningful step gets a concrete verification action: run a function, run a CLI command, execute a focused test, inspect structured output, exercise one tool call, run the slice. Never postpone all testing to the end.
 
-Explicitly defer unnecessary functionality.
+### 6. Name the blocking risks
 
-Optimize P0 for the available implementation time.
+Only risks likely to block implementation: auth, external APIs, unclear tool behavior, model output parsing, environment setup, state handling, side effects. Each gets the simplest mitigation or fallback.
 
----
+### 7. Define done
 
-### 3. Define Implementation Steps
-
-Break P0 into small ordered steps.
-
-For each step specify:
-
-* objective
-* files or modules affected
-* important interface being implemented
-* expected behavior after the step
-* how to verify that it works
-
-Prefer steps that leave the repository in a runnable state.
-
----
-
-### 4. Define Dependencies
-
-Identify dependencies between implementation steps.
-
-Prefer an order that minimizes blocking dependencies and produces useful feedback early.
-
----
-
-### 5. Plan Incremental Verification
-
-After each meaningful step define a concrete verification action.
-
-Examples:
-
-* run a function
-* run a CLI command
-* execute a focused test
-* inspect structured output
-* exercise one tool call
-* run the vertical slice
-
-Do not postpone all testing until the end.
-
----
-
-### 6. Identify Implementation Risks
-
-Identify only risks likely to block implementation.
-
-Examples:
-
-* authentication
-* external APIs
-* unclear tool behavior
-* model output parsing
-* environment setup
-* state handling
-* side-effecting operations
-
-For each risk provide the simplest mitigation or fallback.
-
----
-
-### 7. Define Done
-
-Define exactly what must work before Stage 5 can be considered complete.
-
-Tie this to the minimal vertical slice and design invariants.
+Exactly what must work before the build stage is complete, tied to the vertical slice and to the acceptance criteria in `## Contract`.
 
 ## Guardrails
 
-Do not:
+Do not change the architecture, redesign components, add features absent from `DESIGN.md`, introduce speculative infrastructure, optimize prematurely, promote P1 into P0 without justification, or write code.
 
-* change the architecture
-* redesign components
-* add features not present in `DESIGN.md`
-* introduce speculative infrastructure
-* optimize prematurely
-* turn P1 work into P0 without justification
-* write implementation code
+Prefer thin vertical slices, simple interfaces, incremental verification, and working end-to-end behavior over completeness.
 
-Prefer:
+## Self-Check Before Presenting
 
-* thin vertical slices
-* simple interfaces
-* incremental verification
-* working end-to-end behavior over completeness
+Run `references/self-check.md` against the draft and fix what it finds. Report fixes applied, scope moved out of P0, any design drift (or `None`), and any decision needing human scope judgment (or `None`).
 
 ## Output
 
-Produce `IMPLEMENTATION_PLAN.md` containing:
+`IMPLEMENTATION_PLAN.md`:
 
+```
 # Implementation Plan
-
+## Contract              (copied verbatim from DESIGN.md)
 ## Vertical Slice
-
-## P0 — Required
-
-## P1 — If Time Allows
-
+## P0 - Required
+## P1 - If Time Allows
 ## Out of Scope
-
-## Implementation Steps
-
-For each step:
-
-* Goal
-* Files / modules
-* Key interface
-* Verification
-
+## Implementation Steps  (per step: goal, files, key interface, verification)
 ## Risks and Mitigations
-
 ## Definition of Done
+```

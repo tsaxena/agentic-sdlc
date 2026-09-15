@@ -1,110 +1,107 @@
 # agentic-sdlc
 
-A reusable, stage-gated SDLC for designing and building agentic systems with AI assistance - built for time-constrained work such as engineering interviews.
+A stage-gated SDLC for designing and building agentic systems with AI assistance, sized for a clock - engineering interviews in particular.
 
 The human owns problem interpretation, architecture, tradeoffs, and scope. The AI does analysis, documentation, implementation, review, and evaluation. Every stage ends at an explicit human gate.
 
-## What's in here
+## The five stages
 
-| Path | Purpose |
-| --- | --- |
-| `AGENTS.md` | Global instructions: stage boundaries, design principles, artifact precedence. Loaded by every stage. |
-| `prompts/01-07*.md` | One prompt per SDLC stage. These are what you paste/run to drive a stage. |
-| `skills/*/SKILL.md` | Natively loadable skills the stage prompts invoke by name (e.g. `intent-generation`, `design-review`). |
+| # | Stage | Command | Output | Budget |
+| --- | --- | --- | --- | --- |
+| 1 | Understand | `/understand` | `INTENT.md` | 5 min |
+| 2 | Design | `/design` | `DESIGN.md` | 10 min |
+| 3 | Plan | `/plan` | `IMPLEMENTATION_PLAN.md` | 5 min |
+| 4 | Build | `/build` | working P0 slice + tests | 45 min |
+| 5 | Verify | `/verify` | `VERIFY.md` | 15 min |
 
-## The seven stages
+Roughly 80 minutes, with more than half of it in build. Architecture selection and system design share Stage 2, with one human decision between the halves. Implementation review and system evaluation share Stage 5.
 
-| # | Stage | Prompt | Output artifact |
-| --- | --- | --- | --- |
-| 1 | Understand | `prompts/01-understand.md` | `INTENT.md` |
-| 2 | Architecture | `prompts/02-architecture.md` | `ARCHITECTURE.md` |
-| 3 | Design | `prompts/03-design.md` | `DESIGN.md` |
-| 4 | Plan | `prompts/04-plan.md` | `IMPLEMENTATION_PLAN.md` |
-| 5 | Build | `prompts/05-build.md` | working P0 slice + `BUILD_SUMMARY.md` |
-| 6 | Review | `prompts/06-review.md` | `REVIEW.md` |
-| 7 | Evaluate | `prompts/07-evaluate.md` | `EVAL_RESULTS.md` |
+Each stage reads only the artifact from the stage before it. The upstream artifact is the contract, so context does not accumulate and decisions do not silently drift.
 
-Each stage reads only the artifact from the stage before it. That is deliberate: the upstream artifact is the contract, so context does not accumulate and decisions do not silently drift.
+## The Contract block
 
-## Setup
+`INTENT.md` carries a `## Contract` section holding the acceptance criteria and hard constraints. Every downstream artifact copies it verbatim.
 
-Copy this framework into the project you are working on:
+That is what makes the one-artifact-back rule safe. Stage 5 scores the built system against the original acceptance criteria without ever rereading `CHALLENGE.md`, and no stage can quietly soften the bar it will later be judged against.
+
+Write each criterion so it can be scored by running something.
+
+## Install
+
+As a plugin:
 
 ```bash
-# from the root of your project
-cp -R /path/to/agentic-sdlc/AGENTS.md .
-cp -R /path/to/agentic-sdlc/prompts .
-cp -R /path/to/agentic-sdlc/skills/* .claude/skills/
+/plugin marketplace add /path/to/agentic-sdlc
+/plugin install agentic-sdlc
 ```
 
-Each skill carries `name` / `description` frontmatter, so dropping them in `.claude/skills/` (project scope) or `~/.claude/skills/` (all projects) makes them load natively - the stage prompts can then invoke them by bare name.
+Or copy it into a project directly:
 
-If your agent reads `CLAUDE.md` rather than `AGENTS.md`, symlink it:
+```bash
+cp /path/to/agentic-sdlc/AGENTS.md .
+cp -R /path/to/agentic-sdlc/commands/* .claude/commands/
+cp -R /path/to/agentic-sdlc/skills/*   .claude/skills/
+```
+
+If your agent reads `CLAUDE.md` rather than `AGENTS.md`:
 
 ```bash
 ln -s AGENTS.md CLAUDE.md
 ```
 
-Then write the problem statement into `CHALLENGE.md` at the project root. That file is the only input to Stage 1.
+## Run
 
-## Running a stage
-
-Start a session in your project directory and run the stage prompt. In Claude Code:
+Write the problem statement into `CHALLENGE.md`. That file is the only input to Stage 1.
 
 ```
-Follow prompts/01-understand.md
+/understand
 ```
 
-The stage will read `AGENTS.md` plus its declared input, do the work, and stop at its human gate.
-
-Review the artifact it produced. If it is right, approve it explicitly and move on:
+Review the artifact. If it is right, approve it and move on:
 
 ```
-Approved. Follow prompts/02-architecture.md
+Approved.
+/design
 ```
 
-Repeat through Stage 7. Do not skip a stage, and do not start the next stage before approving the current artifact - the gates are the control mechanism.
+Repeat through `/verify`. The gates are the control mechanism - do not start a stage before approving the previous artifact.
 
-Recommended: start each stage in a **fresh context**. The prompts are written to be self-contained precisely so a clean session works, and it keeps a stale earlier decision from leaking past a gate.
+Start each stage in a **fresh context**. The commands are self-contained so a clean session works, and it stops a stale earlier decision from leaking past a gate.
 
-## Handling conflicts and iteration
+## Time discipline
 
-Artifact precedence when documents disagree:
+Budgets are in the table above and enforced by convention, not by tooling. When a stage runs over: ship the artifact as-is, list what is open under `## Open Questions`, and move on.
 
-1. Explicit user decision
-2. `CHALLENGE.md`
-3. `INTENT.md`
-4. Approved architecture decision
-5. `DESIGN.md`
-6. `IMPLEMENTATION_PLAN.md`
-7. Generated implementation
+Over-budget upstream stages cost build time, and build is the only stage that produces a working system.
 
-If a later stage discovers that an earlier decision is wrong, it must stop and hand the decision back to that stage rather than patching around it. Fix the implementation to match the upstream artifact, not the other way around.
+## Iteration and conflicts
 
-Evaluation failures in Stage 7 are recorded, not fixed in place. Each fix starts a new pass of the SDLC at whichever stage actually owns the problem.
+Artifact precedence is defined in [AGENTS.md](AGENTS.md#artifact-precedence).
 
-## Typical interview run
+If a later stage finds that an earlier decision is wrong, it stops and hands the decision back to the stage that owns it rather than patching around it. Fix the implementation to match the upstream artifact, not the reverse.
 
-```
-CHALLENGE.md
-  -> 01-understand   INTENT.md            (approve)
-  -> 02-architecture ARCHITECTURE.md      (you pick the architecture)
-  -> 03-design       DESIGN.md            (approve)
-  -> 04-plan         IMPLEMENTATION_PLAN.md - P0 / P1 / out of scope (approve)
-  -> 05-build        P0 vertical slice + BUILD_SUMMARY.md
-  -> 06-review       REVIEW.md -> "READY FOR EVALUATION"
-  -> 07-evaluate     EVAL_RESULTS.md
-```
+Stage 5 records failures rather than fixing them, with one exception: a failure that breaks a `## Contract` acceptance criterion gets fixed immediately, with the fix and the reruns recorded. Everything else starts a new pass at whichever stage owns the problem.
 
-Build P0 end-to-end before anything else. A thin working system beats several half-built components. Target roughly 45 minutes for the Stage 5 vertical slice.
+## Scaling up
 
-## Using the skills directly
+For real project work rather than an interview, split Stage 2 into separate architecture and design stages with a gate on each, and split Stage 5 into review and evaluation. The skills are already separable along those lines - `architecture-design` has a part A and part B, and `/verify` runs two independent skills.
 
-The skills are normally invoked by the stage prompts, but once installed in `.claude/skills/` each is usable on its own when you want one specific pass:
+Keep the Contract block either way. It is the part that does the work.
 
-```
-/test-gap-analysis
-/debugging-loop
-```
+## Skills
 
-`debugging-loop` in particular is meant to be reached for mid-build whenever a step fails, rather than at a stage boundary.
+Seven skills, invoked by the stage commands:
+
+| Skill | Stage |
+| --- | --- |
+| `intent-spec` | 1 |
+| `architecture-design` | 2 |
+| `implementation-planning` | 3 |
+| `implementation-execution` | 4 |
+| `debugging-loop` | 4, on any failure |
+| `implementation-review` | 5 |
+| `agent-evaluation` | 5 |
+
+Each is usable on its own when you want one specific pass. `debugging-loop` is meant to be reached for mid-build the moment a step fails, not at a stage boundary.
+
+Long checklists live in each skill's `references/` and load only when needed, so a stage does not pull hundreds of lines of instructions before doing any work.

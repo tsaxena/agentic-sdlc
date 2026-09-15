@@ -1,95 +1,82 @@
 ---
 name: agent-evaluation
-description: Evaluate whether an implemented agentic system actually performs its intended task successfully, reliably, and efficiently, scoring final outputs and trajectory behavior. Use in Stage 7 (Evaluate) of the agentic SDLC.
+description: Evaluate whether an implemented agentic system actually performs its intended task, scoring final outputs and trajectory behavior against the Contract acceptance criteria. Use in Stage 5 (Verify) of the agentic SDLC.
 ---
 
 # Agent Evaluation
 
-## Purpose
-
-Evaluate whether an implemented agentic system actually performs its intended task successfully, reliably, and efficiently.
-
-Evaluate the agent as a system, not merely as a collection of functions.
+Evaluate the agent as a system, not as a collection of functions. The question is whether it does the job, and where it breaks.
 
 ## Inputs
 
-* `REVIEW.md`
-* working implementation
-* available test environment
-
-Treat the system behavior and success criteria carried forward in `REVIEW.md` as authoritative.
+`IMPLEMENTATION_PLAN.md` (its `## Contract` is the acceptance standard), the working implementation, the available test environment.
 
 ## Method
 
-### 1. Identify Evaluation Targets
+### 1. Choose evaluation targets
 
-Determine what matters for this particular agent.
+Only dimensions that matter for this system: task success, correctness, completeness, evidence grounding, false positives, false negatives, tool selection, trajectory quality, recovery from failure, unnecessary actions, latency, cost.
 
-Possible dimensions include:
+Do not measure something merely because it is measurable. Every acceptance criterion in `## Contract` must map to at least one target.
 
-* task success
-* correctness
-* completeness
-* evidence grounding
-* false positives
-* false negatives
-* tool selection
-* trajectory quality
-* recovery from failure
-* unnecessary actions
-* latency
-* cost
+### 2. Build a small case set
 
-Use only metrics relevant to the system.
+Pick from these, keeping only what is relevant:
 
-Do not evaluate everything simply because it can be measured.
+* **Happy path** - normal input the system should handle
+* **Ambiguous input** - the agent must reason before acting
+* **Invalid input** - malformed or unsupported
+* **Tool failure** - a required tool errors or is unavailable
+* **Partial failure** - part of the workflow succeeds, part fails
+* **Repeated execution** - the same task again, where duplicate actions would matter
+* **Adversarial input** - content designed to mislead the agent or override its instructions
+* **Hidden-test-style case** - realistic, and not obviously anticipated by the implementation
 
----
+Five to eight cases is usually right for an interview. Cover every contract criterion first, then spend what is left on failure modes.
 
-### 2. Create Evaluation Cases
+### 3. Define expected behavior before running
 
-Construct a small set of meaningful cases.
+For each case, write down first: the input, the expected final output or output shape, the expected trajectory (which tools, roughly how many steps), the expected failure handling, and what counts as pass, partial, and fail.
 
-Consider:
+Writing expectations after seeing output is not evaluation. It is rationalization, and it is the single easiest way to fool yourself about an agent.
 
-#### Happy Path
+### 4. Run and capture
 
-Normal input the system should handle successfully.
+Run each case. Capture the final output, the tool calls made, the number of steps, errors and retries, the termination reason, and anything surprising in the trajectory.
 
-#### Ambiguous Input
+Prefer deterministic assertions. Use LLM-based judgment only where the criterion is genuinely semantic.
 
-Input where the agent must reason before acting.
+### 5. Score
 
-#### Invalid Input
+Per case: `PASS | PARTIAL | FAIL`, with the evidence. Then score each `## Contract` acceptance criterion `PASS | PARTIAL | FAIL` from the cases that exercise it.
 
-Malformed or unsupported input.
+A case can pass on output while failing on trajectory - an agent that reached the right answer through an unsafe or unbounded path has not passed. Say so explicitly.
 
-#### Tool Failure
+### 6. Analyze failures
 
-A required tool returns an error or unavailable result.
+For each failed or partial case: what actually went wrong, which layer owns it (intent, design, plan, or implementation), whether it is systematic or incidental, and the smallest change that would fix it.
 
-#### Partial Failure
+### 7. Prioritize
 
-Part of the workflow succeeds while another part fails.
+Rank improvements by contract impact first, then by risk, then by cost to fix.
 
-#### Repeated Execution
+## Fixing during evaluation
 
-Run the same or equivalent task again when duplicate actions could matter.
+Record failures rather than fixing them, with one exception: a failure that breaks a `## Contract` acceptance criterion gets fixed now. Record the fix and rerun every case it could affect.
 
-#### Adversarial / Misleading Input
+Never redefine success criteria after seeing results.
 
-Input or external content that may cause incorrect reasoning or unsafe behavior.
+## Guardrails
 
-#### Hidden-Test-Style Case
+Do not evaluate only whether the final answer looks good. Do not expand scope. Do not tune the system against the evaluation cases - a system that passes only its own eval set has learned the eval, not the task.
 
-A realistic case not obviously anticipated by the implementation.
+## Output
 
-Only include cases relevant to the system.
+Feed this into the `## Evaluation` sections of `VERIFY.md`:
 
----
-
-### 3. Define Expected Behavior Before Running
-
-For each case define:
-
-* inpu
+* **Evaluation targets** and how they map to contract criteria
+* **Cases** - input, expected behavior, actual behavior, score
+* **Contract result** - PASS / PARTIAL / FAIL per acceptance criterion
+* **Top failure modes** - ranked, with the layer that owns each
+* **Highest-value next improvement**
+* **Overall** - `MEETS CONTRACT` or `DOES NOT MEET CONTRACT`

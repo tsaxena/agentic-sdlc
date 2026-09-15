@@ -1,204 +1,69 @@
 ---
 name: implementation-review
-description: Determine whether the implementation faithfully executes IMPLEMENTATION_PLAN.md and is ready for system-level evaluation, focusing on correctness, reliability, and unnecessary complexity. Use in Stage 6 (Review) of the agentic SDLC.
+description: Determine whether the implementation faithfully executes IMPLEMENTATION_PLAN.md and is tested well enough for system-level evaluation, focusing on correctness, reliability, test gaps, and unnecessary complexity. Use in Stage 5 (Verify) of the agentic SDLC.
 ---
 
 # Implementation Review
 
-## Purpose
-
-Determine whether the implementation faithfully executes the approved implementation plan and is ready for system-level evaluation.
-
-Focus on correctness, architecture fidelity carried through the plan, reliability, and unnecessary complexity.
+Decide whether the P0 implementation is correct and sufficiently tested to evaluate. Behavior over style.
 
 ## Inputs
 
-* `IMPLEMENTATION_PLAN.md`
-* `BUILD_SUMMARY.md`
-* current implementation
-* existing tests
+`IMPLEMENTATION_PLAN.md` (including its `## Contract`), the current implementation, the existing tests.
 
 ## Method
 
-### 1. Verify P0 Completion
+### 1. P0 status
 
-For each P0 requirement in the implementation plan classify:
+For each P0 item, classify `PASS | PARTIAL | FAIL | NOT VERIFIED` using evidence from code, tests, or an actual run. Code existing is not evidence that it works.
 
-* PASS
-* PARTIAL
-* FAIL
-* NOT VERIFIED
+### 2. Plan fidelity
 
-Use evidence from the code, tests, or actual execution.
+Missing P0 functionality, changed interfaces, changed control flow, skipped deterministic gates, unexpected components, unrequested P1 work, undocumented deviations.
 
-Do not infer completion merely because code exists.
+Not every deviation is wrong, but every meaningful one should be understood.
 
----
+### 3. Correctness on critical paths
 
-### 2. Check Plan Fidelity
+Incorrect assumptions, logic errors, invalid state transitions, malformed output handling, mishandled tool results, failures treated as success, unsafe side effects.
 
-Look for deviations from the approved plan.
+"Failure treated as success" is the highest-yield thing to look for in an agentic system, because it is the one the happy-path demo cannot reveal.
 
-Identify:
+### 4. Agent boundaries
 
-* missing P0 functionality
-* changed interfaces
-* changed control flow
-* skipped deterministic gates
-* unexpected components
-* unnecessary P1 implementation
-* undocumented deviations
+Where LLM reasoning is used, verify it has not taken control of stopping conditions, validation, permissions, retries, success checks, idempotency, or irreversible actions.
 
-Not every deviation is wrong, but every meaningful deviation should be understood.
+### 5. Reliability
 
----
+Bounded execution, retry limits, timeouts, tool failures, malformed model output, repeated actions, partial failure, safe termination. Only what the approved plan actually needs.
 
-### 3. Check Correctness
+### 6. State
 
-Inspect critical paths for:
+Important state is explicit, consistently updated, owned by a clear component, and available when later steps need it. Watch for hidden dependence on conversational context and accidental globals.
 
-* incorrect assumptions
-* logic errors
-* invalid state transitions
-* malformed output handling
-* incorrect tool-result handling
-* failures incorrectly treated as success
-* unsafe side effects
+### 7. Tool boundaries
 
-Prioritize behavior over style.
+Inputs validated, outputs checked, errors propagated or handled, side effects understood, retries safe, success verified.
 
----
+### 8. Complexity
 
-### 4. Check Agent Boundaries
+Unused abstractions, dead code, speculative extensibility, duplicate logic, unnecessary frameworks. Do not request cleanup for aesthetics.
 
-Where LLM reasoning is used, verify that it has not taken control over guarantees better enforced deterministically.
+### 9. Test gaps
 
-Pay particular attention to:
-
-* stopping conditions
-* validation
-* permissions
-* retries
-* success checks
-* idempotency
-* irreversible actions
-
----
-
-### 5. Check Reliability
-
-Review relevant behavior for:
-
-* bounded execution
-* retry limits
-* timeout handling
-* tool failures
-* malformed model output
-* repeated actions
-* partial failure
-* safe termination
-
-Only require mechanisms relevant to the approved plan.
-
----
-
-### 6. Check State
-
-Verify that important state is:
-
-* explicit
-* updated consistently
-* owned by a clear component
-* available when later steps require it
-
-Look for hidden dependence on conversational context or accidental global state.
-
----
-
-### 7. Check Tool Boundaries
-
-For important tools verify:
-
-* inputs are valid
-* outputs are checked
-* errors are propagated or handled
-* side effects are understood
-* retries are safe
-* success is verified
-
----
-
-### 8. Check Complexity
-
-Identify complexity that does not contribute to P0 behavior.
-
-Examples:
-
-* unused abstractions
-* dead code
-* speculative extensibility
-* duplicate logic
-* unnecessary frameworks
-
-Do not request cleanup purely for aesthetic reasons.
-
----
+Run `references/test-gaps.md`. Confidence in critical behavior, not coverage percentage.
 
 ## Output
 
-Return:
+Feed this into the `## Review` and `## Test Gaps` sections of `VERIFY.md`:
 
-### P0 Status
-
-For each P0 item:
-
-`PASS | PARTIAL | FAIL | NOT VERIFIED`
-
-### Blockers
-
-Issues that must be fixed before evaluation.
-
-For each include:
-
-* issue
-* evidence
-* impact
-* smallest fix
-
-### Important Issues
-
-Non-blocking issues worth addressing if time permits.
-
-### Plan Deviations
-
-List meaningful deviations from `IMPLEMENTATION_PLAN.md`.
-
-If none:
-
-`None`
-
-### Simplification Opportunities
-
-Only significant unnecessary complexity.
-
-### Status
-
-Return exactly one:
-
-`READY FOR EVALUATION`
-
-or
-
-`FIX BLOCKERS FIRST`
+* **P0 status** per item
+* **Blockers** - must fix before evaluation. Each with issue, evidence, impact, smallest fix.
+* **Important issues** - non-blocking, worth doing if time remains
+* **Plan deviations** - or `None`
+* **Simplification opportunities** - only significant unnecessary complexity
+* **Test gaps** - critical behavior not covered, and the minimal test that would cover it
 
 ## Guardrails
 
-Do not:
-
-* redesign the architecture
-* broaden scope
-* add new features
-* perform large refactors for style
-* treat every code-quality issue as a blocker
-
-Prefer small targeted fixes.
+Do not redesign, broaden scope, add features, refactor for style, or treat every code-quality issue as a blocker. Prefer small targeted fixes.
