@@ -1,3 +1,8 @@
+---
+name: implementation-planning
+description: Turn an approved DESIGN.md into a small, ordered IMPLEMENTATION_PLAN.md that delivers a working end-to-end vertical slice, split into P0 / P1 / out of scope. Use in Stage 4 (Plan) of the agentic SDLC.
+---
+
 # Implementation Planning
 
 ## Purpose

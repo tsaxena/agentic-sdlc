@@ -1,3 +1,8 @@
+---
+name: intent-review
+description: Validate that a draft INTENT.md is a faithful, complete, architecture-neutral handoff from CHALLENGE.md. Use in Stage 1 (Understand) of the agentic SDLC, after intent-generation and before architecture work begins.
+---
+
 # Intent Review
 
 ## Purpose

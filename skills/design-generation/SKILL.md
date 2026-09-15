@@ -1,3 +1,8 @@
+---
+name: design-generation
+description: Turn an approved ARCHITECTURE.md into a concise, implementation-ready DESIGN.md without changing the selected architecture. Use in Stage 3 (Design) of the agentic SDLC.
+---
+
 # Design Generation
 
 ## Purpose

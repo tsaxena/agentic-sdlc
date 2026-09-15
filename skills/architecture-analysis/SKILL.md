@@ -1,3 +1,8 @@
+---
+name: architecture-analysis
+description: Analyze an approved INTENT.md and identify the simplest system architecture that satisfies it, comparing realistic patterns without designing implementation details. Use in Stage 2 (Architecture) of the agentic SDLC.
+---
+
 # Architecture Analysis
 
 ## Purpose

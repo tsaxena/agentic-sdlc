@@ -1,3 +1,8 @@
+---
+name: plan-review
+description: Validate that a draft IMPLEMENTATION_PLAN.md is a feasible, minimal execution plan for the approved DESIGN.md, catching scope creep, missing critical work, and poor ordering. Use in Stage 4 (Plan) of the agentic SDLC, before coding begins.
+---
+
 # Implementation Plan Review
 
 ## Purpose

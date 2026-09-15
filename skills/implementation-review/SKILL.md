@@ -1,3 +1,8 @@
+---
+name: implementation-review
+description: Determine whether the implementation faithfully executes IMPLEMENTATION_PLAN.md and is ready for system-level evaluation, focusing on correctness, reliability, and unnecessary complexity. Use in Stage 6 (Review) of the agentic SDLC.
+---
+
 # Implementation Review
 
 ## Purpose

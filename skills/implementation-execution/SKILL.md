@@ -1,3 +1,8 @@
+---
+name: implementation-execution
+description: Implement an approved IMPLEMENTATION_PLAN.md as a working P0 vertical slice, verifying incrementally and preserving the approved design. Use in Stage 5 (Build) of the agentic SDLC.
+---
+
 # Implementation Execution
 
 ## Purpose

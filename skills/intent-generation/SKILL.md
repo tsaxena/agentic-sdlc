@@ -1,3 +1,8 @@
+---
+name: intent-generation
+description: Convert an ambiguous engineering challenge or CHALLENGE.md into a concise, architecture-neutral INTENT.md problem specification. Use in Stage 1 (Understand) of the agentic SDLC, before any architecture work.
+---
+
 # Intent Generation
 
 ## Purpose

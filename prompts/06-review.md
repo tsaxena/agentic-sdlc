@@ -40,4 +40,31 @@ If review reveals a problem requiring a design or architecture change, stop and 
 
 ## Output
 
-Create `REVIEW.md
+Create `REVIEW.md`.
+
+It should capture:
+
+* what was reviewed
+* acceptance criteria results
+* blockers found, with evidence, impact, and the smallest fix
+* fixes applied during this stage
+* test gaps that matter before evaluation
+* important non-blocking issues
+* meaningful deviations from `IMPLEMENTATION_PLAN.md`
+* issues returned to an earlier stage, if any
+
+End `REVIEW.md` with exactly one status line:
+
+`READY FOR EVALUATION`
+
+or
+
+`FIX BLOCKERS FIRST`
+
+## Human Gate
+
+Present `REVIEW.md` for human approval.
+
+Do not proceed to evaluation unless the status is `READY FOR EVALUATION` and the user approves.
+
+Stop after Stage 6.

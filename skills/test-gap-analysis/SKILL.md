@@ -1,3 +1,8 @@
+---
+name: test-gap-analysis
+description: Determine whether existing tests give enough confidence in critical behavior to move from implementation review to system-level evaluation. Use in Stage 6 (Review) of the agentic SDLC, alongside implementation-review.
+---
+
 # Test Gap Analysis
 
 ## Purpose

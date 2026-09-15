@@ -1,3 +1,8 @@
+---
+name: agent-evaluation
+description: Evaluate whether an implemented agentic system actually performs its intended task successfully, reliably, and efficiently, scoring final outputs and trajectory behavior. Use in Stage 7 (Evaluate) of the agentic SDLC.
+---
+
 # Agent Evaluation
 
 ## Purpose

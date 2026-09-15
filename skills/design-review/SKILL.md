@@ -1,3 +1,8 @@
+---
+name: design-review
+description: Validate that a draft DESIGN.md is a faithful, complete, and implementable realization of the approved ARCHITECTURE.md. Use in Stage 3 (Design) of the agentic SDLC, after design-generation and before implementation planning.
+---
+
 # Design Review
 
 ## Purpose
